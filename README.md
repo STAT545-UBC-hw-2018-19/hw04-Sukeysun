@@ -2,7 +2,7 @@
 ## Tidy data and joins
 
 - In this repository, you can find:
-    * I wrote a cheetsheat of tidyr.
+    * I wrote a cheetsheet of tidyr.
     * I explored different types of joins 
     * This assignment is quite long so I used TOC which is helpful to navigate my md much quicker.
 
