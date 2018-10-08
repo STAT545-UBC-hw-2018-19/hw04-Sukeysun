@@ -9,6 +9,6 @@
   
 **For details:**
 
-[Tidy_data_and_joins.Rmd]https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/Tidy%20data%20and%20joins.Rmd)  
+[Tidy_data_and_joins.Rmd](https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/Tidy%20data%20and%20joins.Rmd)  
 
 [Tidy_data_and_joins.md](https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/Tidy_data_and_joins.md)
