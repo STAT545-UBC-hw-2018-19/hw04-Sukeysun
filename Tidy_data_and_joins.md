@@ -10,7 +10,7 @@ October 4, 2018
         -   [gather](#gather)
         -   [spread](#spread)
         -   [unite](#unite)
-        -   [separate( )](#separate)
+        -   [separate](#separate)
         -   [Simple completion of missing values](#simple-completion-of-missing-values)
 -   [Join Prompts (join, merge, look up)](#join-prompts-join-merge-look-up)
     -   [Activity \#1 join join join](#activity-1-join-join-join)
@@ -106,11 +106,7 @@ myt <- ttheme_default(
                  colhead = list( fg_params=list( col="white" ),
                                 bg_params=list( fill="red" ) ) )
 
-GSSvocab_distinct <-  GSSvocab 
-
-GSSvocab_distinct$name <- rownames(GSSvocab) 
-
-GSSvocab_distinct <- GSSvocab %>% distinct()
+GSSvocab_distinct <-  GSSvocab %>% distinct()
 
 grid.arrange( top = " First 10 rows of   GSSvocab_distinct",
              tableGrob( head(    GSSvocab_distinct,10  ),  ## look the first 10 rows
@@ -165,7 +161,7 @@ The tables above give has the head and tail of our new data frame--GSSvocabNew. 
 **A good point about tidyr is that we can gather only a number of columns while the other columns remain the same**
 
 ``` r
-## If we want gather all the columns between ageGroup and age while keeping the carb and car columns unchanged
+## If we want gather all the columns between ageGroup and age while keeping the other columns unchanged
 
  GSSvocabNew1 <-   GSSvocab_distinct %>% 
   gather( attribute, value, ageGroup:age )
@@ -234,7 +230,7 @@ Sometimes, in order to meet the requirements of modeling or drawing, it is often
   mutate(ind = row_number()) %>% 
   spread(  attribute, value  )
 
-GSSvocabSpread$ind <- NULL  ## remove NULL
+GSSvocabSpread$ind <- NULL  ## remove ind
 
 grid.arrange( top = " comparison of  GSSvocab_distinct and  GSSvocabSpread",
              tableGrob( head(   GSSvocab_distinct,5  ),
@@ -331,7 +327,7 @@ grid.arrange( top = "unite data",
 
 ![](https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/pictures/chunk%208%20unite-1.png)
 
-### separate( )
+### separate
 
 separate( ) function splits a column into multiple columns, which can be used for splitting log data or datetime data. The syntax is as follows:
 
