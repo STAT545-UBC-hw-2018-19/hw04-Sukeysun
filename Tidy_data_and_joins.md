@@ -7,19 +7,19 @@ October 4, 2018
     -   [Activity\#1 cheatsheet](#activity1-cheatsheet)
         -   [Introduction](#introduction)
         -   [Load data](#load-data)
-        -   [gather( )](#gather)
-        -   [spread( )](#spread)
-        -   [unite( )](#unite)
+        -   [gather](#gather)
+        -   [spread](#spread)
+        -   [unite](#unite)
         -   [separate( )](#separate)
         -   [Simple completion of missing values](#simple-completion-of-missing-values)
 -   [Join Prompts (join, merge, look up)](#join-prompts-join-merge-look-up)
     -   [Activity \#1 join join join](#activity-1-join-join-join)
-        -   [left\_join( )](#left_join)
-        -   [right\_join( )](#right_join)
-        -   [inner\_join( )](#inner_join)
-        -   [full\_join( )](#full_join)
-        -   [semi\_join( )](#semi_join)
-        -   [anti\_join( )](#anti_join)
+        -   [left\_join](#left_join)
+        -   [right\_join](#right_join)
+        -   [inner\_join](#inner_join)
+        -   [full\_join](#full_join)
+        -   [semi\_join](#semi_join)
+        -   [anti\_join](#anti_join)
 
 Data Reshaping Prompts ( and relationship to aggregation )
 ==========================================================
@@ -44,8 +44,8 @@ The tidyr package mainly involves:
 
 -   Simple completion of missing values
 -   Long table converts into wide table and wide table converts into long table
-    -   Gather- converts large-width data into a longer form that is analogous to the ability to fuse functions from the reshape2 package
-    -   Spread - converts long data into a wider form, which is analogous to the function of casting functions from the reshape2 package.
+    -   gather- converts wide data to longer format. It is analogous to the melt function from reshape2
+    -   spread - converts long data to wider format. It is analogous to the cast function from reshape2
     -   ***The opposite of gather( ) is spread( ), the former stacking different columns, the latter separating the same column***
 -   Column splitting and column merging
     -   Separate - splits a column into multiple columns by separator
@@ -56,7 +56,7 @@ The tidyr package mainly involves:
 ### Load data
 
 ``` r
-## Use the mtcars dataset in the datasets package to demonstrate
+## Use the  GSSvocab dataset in the datasets package to demonstrate
 library( tidyr )
 ```
 
@@ -93,6 +93,9 @@ library( gridExtra )
     ##     combine
 
 ``` r
+library(carData)
+
+
 myt <- ttheme_default( 
          # Use hjust and x to center the text
          # Alternate the row fill colours
@@ -103,12 +106,14 @@ myt <- ttheme_default(
                  colhead = list( fg_params=list( col="white" ),
                                 bg_params=list( fill="red" ) ) )
 
-mtcars_add <- mtcars
-mtcars_add$car <- rownames( mtcars_add )   ## add the rownames into mtcars  
-mtcars_add <- mtcars_add[, c( 12, 1:11 )]  ## put car ahead
+GSSvocab_distinct <-  GSSvocab 
 
-grid.arrange( top = " First 10 rows of mtcars",
-             tableGrob( head(  mtcars_add,10  ),
+GSSvocab_distinct$name <- rownames(GSSvocab) 
+
+GSSvocab_distinct <- GSSvocab %>% distinct()
+
+grid.arrange( top = " First 10 rows of   GSSvocab_distinct",
+             tableGrob( head(    GSSvocab_distinct,10  ),  ## look the first 10 rows
              theme=myt,
              rows=NULL
               ) )
@@ -118,7 +123,7 @@ grid.arrange( top = " First 10 rows of mtcars",
 
 ![](https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/pictures/chunk%201%20original%20data-1.png)
 
-### gather( )
+### gather
 
 Use the `gather( )` function to implement a wide table-to-long table with the following syntax:
 
@@ -131,43 +136,53 @@ Use the `gather( )` function to implement a wide table-to-long table with the fo
 -   na.rm: whether to delete missing values
 
 ``` r
-## In addition to the car column, the remaining columns are aggregated into two columns, named attribute and value.
+## In addition to the gender column, the remaining columns are aggregated into two columns, named attribute and value.
 
-mtcarsNew <- mtcars_add %>% 
-  gather( attribute, value, -car )
+ GSSvocabNew <-   GSSvocab_distinct %>% 
+  gather( attribute, value, -gender )
+```
 
-grid.arrange( top = " head and tail of mtcarsNew ( gather all columns except car ) ",
-             tableGrob( head(  mtcarsNew,10  ),
+    ## Warning: attributes are not identical across measure variables;
+    ## they will be dropped
+
+``` r
+grid.arrange( top = " head and tail of  GSSvocabNew ( gather all columns except gender ) ",
+             tableGrob( head(   GSSvocabNew,10  ),
              theme=myt,
              rows=NULL ),
-             tableGrob( tail(  mtcarsNew,10  ),
+             tableGrob( tail(   GSSvocabNew,10  ),
              theme=myt,
              rows=NULL ),
-             nrow = 1 )
+             nrow = 1 )   ## set these two tables side by side
 ```
 
 ![](Tidy_data_and_joins_files/figure-markdown_github/chunk%202%20gather1-1.png)
 
 ![](https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/pictures/chunk%202%20gather1-1.png)
 
-The tables above give has the head and tail of our new data frame-- mtcarsNew. We can see that all colnames except car in mtcars\_add are gathered in "attributte" and the value assigned to them are gathered in "value".
+The tables above give has the head and tail of our new data frame--GSSvocabNew. We can see that all colnames except gender in GSSvocab\_distinct are gathered in "attributte" and the value assigned to them are gathered in "value".
 
 **A good point about tidyr is that we can gather only a number of columns while the other columns remain the same**
 
 ``` r
-## If we want gather all the columns between mpg and gear while keeping the carb and car columns unchanged
+## If we want gather all the columns between ageGroup and age while keeping the carb and car columns unchanged
 
-mtcarsNew1 <- mtcars_add %>% 
-  gather( attribute, value, mpg:gear )
+ GSSvocabNew1 <-   GSSvocab_distinct %>% 
+  gather( attribute, value, ageGroup:age )
+```
 
-grid.arrange( top = " head and tail of mtcarsNew1 ( gather columns between mpg and gear )",
-             tableGrob( head(  mtcarsNew1,10  ),
+    ## Warning: attributes are not identical across measure variables;
+    ## they will be dropped
+
+``` r
+grid.arrange( top = " head and tail of  GSSvocabNew1 ( gather columns between ageGroup and age )",
+             tableGrob( head(   GSSvocabNew1,10 ),
              theme=myt,
              rows=NULL ),
-             tableGrob( tail(  mtcarsNew1,10  ),
+             tableGrob( tail(   GSSvocabNew1,10  ),
              theme=myt,
              rows=NULL ),
-             nrow = 2 )
+             nrow = 1 )
 ```
 
 ![](Tidy_data_and_joins_files/figure-markdown_github/chunk%203%20gather2-1.png)
@@ -176,16 +191,21 @@ grid.arrange( top = " head and tail of mtcarsNew1 ( gather columns between mpg a
 
 ``` r
 ## if we dont want to gather adjacent column
-mtcarsNew2 <- mtcars_add %>% 
+ GSSvocabNew2 <-   GSSvocab_distinct %>% 
   gather(  attribute, value,
-          `mpg`,`gear`,
-         -car )
+          `year`,`nativeBorn`,
+         -educ )
+```
 
-grid.arrange( top = " head and tail of mtcarsNew2 ( gather mpg and gear )",
-             tableGrob( head(  mtcarsNew2,5  ),
+    ## Warning: attributes are not identical across measure variables;
+    ## they will be dropped
+
+``` r
+grid.arrange( top = " head and tail of  GSSvocabNew2 ( gather year and nativeBorn )",
+             tableGrob( head(   GSSvocabNew2,5  ),
              theme=myt,
              rows=NULL ),
-             tableGrob( tail(  mtcarsNew2,5  ),
+             tableGrob( tail(   GSSvocabNew2,5  ),
              theme=myt,
              rows=NULL ),
              nrow = 2 )
@@ -195,7 +215,7 @@ grid.arrange( top = " head and tail of mtcarsNew2 ( gather mpg and gear )",
 
 ![](https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/pictures/chunk%204%20gather3-1.png)
 
-### spread( )
+### spread
 
 Sometimes, in order to meet the requirements of modeling or drawing, it is often necessary to convert a long table into a wide table or a wide table into a long table. How to implement the conversion of these two data table types. Use the spread( ) function to implement a long table widening table with the following syntax:
 
@@ -207,35 +227,63 @@ Sometimes, in order to meet the requirements of modeling or drawing, it is often
 -   fill: For missing values, assign the value of fill to the missing value after transformation
 
 ``` r
-mtcarsSpread <- mtcarsNew %>% 
+## if we want to conver a long table to a wide one
+ GSSvocabSpread <-  GSSvocabNew %>% 
+## to avoid duplicate identifiers
+  group_by( attribute ) %>% 
+  mutate(ind = row_number()) %>% 
   spread(  attribute, value  )
 
-grid.arrange( top = " comparison of mtcars_add and mtcarsSpread",
-             tableGrob( head(  mtcars_add,5  ),
+GSSvocabSpread$ind <- NULL  ## remove NULL
+
+grid.arrange( top = " comparison of  GSSvocab_distinct and  GSSvocabSpread",
+             tableGrob( head(   GSSvocab_distinct,5  ),
              theme=myt,
              rows=NULL ),
-             
-             tableGrob( head(  mtcarsSpread,5  ),
+      
+             tableGrob( head(   GSSvocabSpread,5  ),
              theme=myt,
              rows=NULL ),
-             nrow = 2 )
+             nrow = 2
+             )
 ```
 
 ![](Tidy_data_and_joins_files/figure-markdown_github/chunk%205%20spread-1.png)
 
 ![](https://github.com/STAT545-UBC-students/hw04-Sukeysun/blob/master/pictures/chunk%205%20spread-1.png)
 
+When I simply used spread(attribure, value), I got Error: Duplicate identifiers for rows. Then I found method [here](https://stackoverflow.com/questions/39053451/using-spread-with-duplicate-identifiers-for-rows). **However, I dont know why some values have been converted into character**
+
 ``` r
-## check the difference between mtcars_add and mtcarsSpread
-setdiff( mtcars_add,mtcarsSpread )
+## check the difference between  GSSvocab_add and  GSSvocabSpread
+## convert character to numeric in order to be compareable to GSSvocab_distinct
+GSSvocabSpreadnew <- transform( GSSvocabSpread, 
+                                vocab = as.numeric( vocab ), 
+                                age = as.numeric( age ),
+                                educ = as.numeric( educ ) )
+
+setdiff(  GSSvocab_distinct, GSSvocabSpreadnew )
 ```
 
-    ##  [1] car  am   carb cyl  disp drat gear hp   mpg  qsec vs   wt  
+    ## Warning: Column `ageGroup` joining character vector and factor, coercing
+    ## into character vector
+
+    ## Warning: Column `educGroup` joining character vector and factor, coercing
+    ## into character vector
+
+    ## Warning: Column `nativeBorn` joining character vector and factor, coercing
+    ## into character vector
+
+    ## Warning: Column `year` joining character vector and factor, coercing into
+    ## character vector
+
+    ## [1] gender     age        ageGroup   educ       educGroup  nativeBorn
+    ## [7] vocab      year      
     ## <0 rows> (or 0-length row.names)
 
-The diffference between the two table above is only the sequence of column
+It returns 0 rows, that is to say the values in GSSvocab\_add and GSSvocabSpread are matching. And the only difference between the two table above is only the sequence of column.
 
-### unite( )
+### unite
 
 The effect of unite( ) is to combine multiple columns into one column.The syntax is as follows:
 
@@ -251,11 +299,11 @@ The effect of unite( ) is to combine multiple columns into one column.The syntax
 ## create a new dataframe
 set.seed( 1 )
 date <- as.Date( '2018-10-04' ) + 0:14
-hour <- sample( 1:24, 15 )
+hour <- sample( 1:24, 15 )   ## random select 15 numbers between 1 and 24
 min <- sample( 1:60, 15 )
 second <- sample( 1:60, 15 )
-event <- sample( letters, 15 )
-data <- tibble( date, hour, min, second, event )
+event <- sample( letters, 15 ) ## random select 15 letters
+data <- tibble( date, hour, min, second, event ) 
 
 grid.arrange( top = "create a new data",
              tableGrob( head(  data,10  ),
@@ -270,7 +318,7 @@ grid.arrange( top = "create a new data",
 ``` r
 # Combine date, hour, min and second columns into new column datetime
 dataNew <- data %>%
-  unite( datehour, date, hour, sep = '  ' ) %>%  ## two spaces
+  unite( datehour, date, hour, sep = '  ' ) %>%  ## be careful: there are two spaces
   unite( datetime, datehour, min, second, sep = ':' )
 
 grid.arrange( top = "unite data",
@@ -323,6 +371,8 @@ grid.arrange( top = "separate data",
 Create an example of a data frame with missing values
 
 ``` r
+## create data with missing value
+
 x <- c( 1,2,7,8,NA,10,22,NA,15 )
 y <-c( 'a',NA,'b',NA,'b','a','a','b','a' )
 df <- tibble( x = x, y = y )
@@ -352,7 +402,8 @@ calculate the median and mean
     ## [1] 8
 
 ``` r
-( y_mode <- df$y[which.max (table( df$y ) ) ] )
+## which.max will find the location of value appears most often
+( y_mode <- df$y[which.max (table( df$y ) ) ] ) 
 ```
 
     ## [1] "a"
@@ -360,6 +411,8 @@ calculate the median and mean
 Replace the missing values of x and y in data frame df
 
 ``` r
+## replace missing value of x with x_mean and missing value of y with y_mode
+
 df2 <- replace_na( data = df, replace = list( x = x_mean, y = y_mode ) ) 
 
 grid.arrange( top = " data with replaced value",
@@ -399,7 +452,7 @@ nonemiss.df <- data.frame(y = y, x1 = x1, x2 = x2, x3 = x3, x4 = x4)
 
 set.seed( 20 )
 miss.df <- data.frame( y = y, x1 = x1, x2 = x2, x3 = x3, x4 = x4 )
-miss.df[ sample( 1:nrow(miss.df ), 2 ),1 ] <- NA    ## select two rows in x1 
+miss.df[ sample( 1:nrow(miss.df ), 2 ),1 ] <- NA    ## random select two rows in x1 to be NA
 miss.df[ sample( 1:nrow(miss.df ), 3 ),2 ] <- NA
 miss.df[ sample( 1:nrow(miss.df ), 1 ),3 ] <- NA
 
@@ -467,6 +520,8 @@ Any row with one or more missing values in the dataset will be deleted. Generall
 This method is a method of processing missing values based on repeated simulations. It will generate a complete set of data from a data set containing missing values, all of which are replaced by the Monte Carlo method. There are many alternative methods, such as Bayesian linear regression, self-service linear regression, Logist regression and linear discriminant analysis.
 
 ``` r
+## drop rows with NA values
+
 delete.df <- miss.df %>% 
   drop_na()
 
@@ -491,7 +546,7 @@ Activity \#1 join join join
 
 In this part, I use country\_codes data set and gapminder data set. country\_codes is a dataframe of gapminder country names and ISO 3166-1 country codes
 
-### left\_join( )
+### left\_join
 
 ``` r
 library( gapminder )
@@ -524,6 +579,7 @@ return all rows from x, and all columns from x and y. Rows in x with no match in
 let's check if there is NA values in the new columns
 
 ``` r
+## find the subset of left_cg with country name not in gapminder
 diff_cg <- subset(left_cg, !(country %in% gapminder$country))
 
 grid.arrange( top = "check if there is NA values in the new columns ",
@@ -538,7 +594,7 @@ grid.arrange( top = "check if there is NA values in the new columns ",
 
 The table above is as we expected, it has NA values.
 
-### right\_join( )
+### right\_join
 
 ``` r
 right_cg <- country_codes %>% 
@@ -562,14 +618,18 @@ grid.arrange( top = "right join of gapminder and country_codes ",
 As shown in R document: right\_join(x,y) returns all rows from y, and all columns from x and y. Rows in y with no match in x will have NA values in the new columns. If there are multiple matches between x and y, all combinations of the matches are returned.
 
 ``` r
+## find all unique country names in country_codes and gapminder
 code_country <- unique( country_codes$country ) 
 gapminder_country <- unique( gapminder$country )
+
+## check if gapminder_country is a subset of code_country
 all( gapminder_country %in% code_country) ## returns true
 ```
 
     ## [1] TRUE
 
 ``` r
+## check which rows have NA values
 which(is.na(right_cg)) # return nothing
 ```
 
@@ -577,7 +637,7 @@ which(is.na(right_cg)) # return nothing
 
 Since the all(gapminder\_country %in% code\_country) returns TRUE, we can make sure that the country name of gapminder is a subset of the country name in country\_codes. That is to say, all country names in gapminder have matching values in that of country\_codes. So there suppose to be no NA value in right\_cg, which can be proved by which(is.na(right\_cg)).
 
-### inner\_join( )
+### inner\_join
 
 ``` r
 inner_cg <- inner_join( country_codes, gapminder, by = "country")
@@ -601,6 +661,8 @@ let's check if we lose some countries:
 
 ``` r
 inner_country <- unique( inner_cg$country ) 
+
+## check the difference between code_country and inner_country
 setdiff( code_country, inner_country )
 ```
 
@@ -630,7 +692,7 @@ setdiff( code_country, inner_country )
 
 We lose some rows from country\_codes, although these countries appear in country\_codes, they are not in gapminder. inner\_join( ) only returns infromation of countries which appear in country\_codes and gapminder
 
-### full\_join( )
+### full\_join
 
 ``` r
 full_cg <- full_join( gapminder, country_codes)
@@ -664,7 +726,7 @@ setdiff( full_cg, left_cg )
 
 As we ecpected, it returns 0 rows, which means full\_cg is same as left\_cg.
 
-### semi\_join( )
+### semi\_join
 
 ``` r
 sj_cg <- semi_join( country_codes, gapminder, by = "country")
@@ -697,7 +759,7 @@ grid.arrange( top = "semi_join of country_codes and gapminder ",
 
 We can notice from these two table aboves, semi\_join(x,y) returns all rows from x which have matching values in y. sj\_cg is a dataframe that has matching values in column country of gapminder and sj\_gc is a dataframe which has all rows that have matching values in column country of country\_codes.
 
-### anti\_join( )
+### anti\_join
 
 ``` r
 anti_cg <- anti_join( country_codes, gapminder, by = "country" )
