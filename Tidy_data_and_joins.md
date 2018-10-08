@@ -455,10 +455,15 @@ md.pattern( miss.df )
 6 is the total number of missing values. x3 and x4 have no missing value while x2 has one missing values, y has two missing values and x1 has 3 missing values
 
 ***Missing data processing method*** **Reasoning**
+
 The method fills in or restores missing values based on mathematical or logical relationships between variables, such as inferring possible values of missing values based on relationships between variables; inferring missing genders by name or inferring user likelihood based on purchased product characteristics The age group to which it belongs.
+
 **Row deletion**
+
 Any row with one or more missing values in the dataset will be deleted. Generally, the missing data is completely randomly generated, and the missing amount is only a small part of the dataset. we can consider using this method to process the missing values.
+
 **Multiple interpolation**
+
 This method is a method of processing missing values based on repeated simulations. It will generate a complete set of data from a data set containing missing values, all of which are replaced by the Monte Carlo method. There are many alternative methods, such as Bayesian linear regression, self-service linear regression, Logist regression and linear discriminant analysis.
 
 ``` r
